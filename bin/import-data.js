@@ -8,21 +8,21 @@ const readSampleData = (filePath) => new Promise((promiseRes, promiseRej) => {
     inputStream
         .on('error', promiseRej)
         .pipe(new CsvReadableStream({ parseNumbers: true, delimiter: '\t' }))
-        .on('data', (row) => { 
+        .on('data', (row) => {
             if (header === false) {
                 header = row;
                 return;
             }
-            const obj = {}
-            header.forEach((element, i) => { obj[element] = row[i] });
-            result.push(obj) 
+            const obj = {};
+            header.forEach((element, i) => { obj[element] = row[i]; });
+            result.push(obj);
         })
         .on('end', () => promiseRes(result));
-})
+});
 
 const main = async () => {
     const result = await readSampleData('./bin/cities_canada-usa.tsv');
-    console.log(result)
-    console.log(result[0])
-}
+    console.log(result);
+    console.log(result[0]);
+};
 main();
