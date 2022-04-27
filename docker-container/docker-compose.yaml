@@ -1,0 +1,36 @@
+version: '3.9'
+services:
+    api-mongodb:
+        image: mongo:5.0.8
+        restart: unless-stopped
+        volumes:
+            - mongodb-data:/data/db
+    api:
+        # image: api-unit-test:latest
+        restart: unless-stopped
+        build:
+            context: ./..
+            dockerfile: docker-container/api.Dockerfile
+        depends_on:
+            - "api-mongodb"
+        ports:
+            - '36000:36000'
+        volumes: 
+            - ./../index.js:/app/index.js
+        environment:
+            MONGO_DB_URI: 'mongodb://api-mongodb:27017/city'
+            MONGOOSE_DEBUGER: 'true'
+            HOSTNAME: '0.0.0.0'
+            SERVER_DISPLAY_PORT: 36000
+        command:
+            - start
+        healthcheck:
+            test: curl -f http://localhost:36000/health || kill 1
+            interval: 5s
+            retries: 2
+            start_period: 5s
+            timeout: 1s
+
+volumes:
+    mongodb-data:
+        name: mongodb-data

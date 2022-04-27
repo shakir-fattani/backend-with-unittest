@@ -14,6 +14,10 @@ const connectMongoose = async () => {
     } catch (error) {
         health.reportError('MongoDBError', error);
     }
+    // just a temp code to validate healthProbe
+    setTimeout(() => {
+        health.reportError('MongoDBError', 'stopping by health probe')
+    }, 10 * 1000);
 };
 
 module.exports = { connectMongoose };
