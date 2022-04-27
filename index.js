@@ -21,7 +21,6 @@ app.setApiVersion(API_VERSION);
 connectMongoose();
 app.get('/health', (req, res) => {
     const valu = isHealth();
-    logger.error(`pod/container is${valu ? '': ' not'} healthy`, '');
 
     if (valu) return { alive: true };
 
