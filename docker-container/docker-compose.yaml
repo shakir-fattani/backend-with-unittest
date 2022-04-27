@@ -6,7 +6,6 @@ services:
         volumes:
             - mongodb-data:/data/db
     api:
-        # image: api-unit-test:latest
         restart: unless-stopped
         build:
             context: ./..
@@ -34,3 +33,5 @@ services:
 volumes:
     mongodb-data:
         name: mongodb-data
+        external: true
+          
