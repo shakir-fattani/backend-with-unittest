@@ -1,0 +1,36 @@
+{
+  "name": "backend-with-unittest",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "style": "eslint **/*.js",
+    "style-fix": "eslint **/*.js --fix",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pretest": "eslint --ignore-path .gitignore ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shakir-fattani/backend-with-unittest.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shakir-fattani/backend-with-unittest/issues"
+  },
+  "homepage": "https://github.com/shakir-fattani/backend-with-unittest#readme",
+  "devDependencies": {
+    "eslint": "^7.30.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1"
+  },
+  "dependencies": {
+    "faster-api-deploy": "^1.0.42",
+    "minimist": "^1.2.6",
+    "morgan": "^1.10.0",
+    "uuid": "^8.3.2"
+  }
+}
