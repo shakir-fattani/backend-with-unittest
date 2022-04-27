@@ -28,6 +28,7 @@
     "eslint-plugin-import": "^2.22.1"
   },
   "dependencies": {
+    "csv-reader": "^1.0.8",
     "faster-api-deploy": "^1.0.42",
     "minimist": "^1.2.6",
     "mongoose": "^6.3.1",
