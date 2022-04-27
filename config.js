@@ -12,6 +12,7 @@ const API_VERSION = '1.0';
 const HOST_NAME = PARAMS.hostServer || process.env.HOSTNAME || os.hostname() || 'localhost';
 
 const SERVER_PORT = PARAMS.serverDisplayPort || process.env.SERVER_DISPLAY_PORT || 36000;
+const MONGOOSE_DEBUGER = PARAMS.mongooseDebugger || process.env.MONGOOSE_DEBUGER || false;
 const MONGO_DB_URI = PARAMS.mongoDBUri || process.env.MONGO_DB_URI || 'mongodb://localhost:27017/city';
 
 let debugValue = 0;
@@ -30,6 +31,7 @@ module.exports = {
     SERVER_PORT,
     MONGO_DB_URI,
     START_TIME,
+    MONGOOSE_DEBUGER,
 
     getDebug,
     setDebug,

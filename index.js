@@ -1,8 +1,13 @@
 const RESTApi = require('faster-api-deploy');
-const logger = require('./logger');
+const logger = require('./common/logger');
+const { getHealthCheck } = require('./common/health');
+const { connectMongoose } = require('./common/mongoose');
 const {
-    getUpTime, START_TIME, POWERED_BY, VERSION, API_VERSION, APP_NAME, SERVER_PORT, HOST_NAME,
+    getUpTime, START_TIME, POWERED_BY, VERSION,
+    API_VERSION, APP_NAME, SERVER_PORT, HOST_NAME,
 } = require('./config');
+
+const isHealth = getHealthCheck();
 
 const app = new RESTApi('', {
     isSupportJSON: false,
@@ -13,7 +18,15 @@ app.setPoweredBy(POWERED_BY);
 app.setVersion(VERSION);
 app.setApiVersion(API_VERSION);
 
-app.get('/health', () => ({ alive: true }));
+connectMongoose();
+app.get('/health', (req, res) => {
+    if (!isHealth()) {
+        res.status(400);
+        return { alive: false };
+    }
+    return { alive: true };
+});
+
 app.options('/*', (req, res) => res.end());
 
 app.get('/identify', () => {
@@ -33,7 +46,7 @@ app.get('/identify', () => {
     };
 });
 
-app.expressUseSingleParam(require('./request-logger'));
+app.expressUseSingleParam(require('./common/request-logger'));
 
 app.filter((req, res, next) => {
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate'); // HTTP 1.1
