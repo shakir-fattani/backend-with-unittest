@@ -1,4 +1,4 @@
-const Location = require('./models/city');
+const Location = require('./models/location');
 
 const addDistanceFieldinCity = (long, lat, radius) => ({
     $geoNear: {

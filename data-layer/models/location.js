@@ -5,7 +5,7 @@ const pointSchema = new mongoose.Schema({
     coordinates: { type: [Number], required: true },
 }, { _id: false });
 
-const citySchema = new mongoose.Schema({
+const locationSchema = new mongoose.Schema({
     id: { type: Number, required: true },
     name: { type: String, required: true },
     location: { type: pointSchema, required: true },
@@ -26,8 +26,8 @@ const citySchema = new mongoose.Schema({
     modified_at: { type: Date, required: true },
 }, { timestamps: true });
 
-citySchema.index({ location: '2dsphere' });
+locationSchema.index({ location: '2dsphere' });
 
-const City = mongoose.model('City', citySchema);
+const Location = mongoose.model('Location', locationSchema);
 
-module.exports = City;
+module.exports = Location;
