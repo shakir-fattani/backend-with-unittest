@@ -1,5 +1,5 @@
 const RestApi = require('faster-api-deploy');
-const { CityService } = require('../services/index');
+const { LocationService } = require('../services/index');
 
 const router = new RestApi.RESTRouter();
 
@@ -9,7 +9,7 @@ router.get('/suggestions', (req) => {
     } = req.query;
 
     return {
-        suggestions: CityService.getSuggestion({
+        suggestions: LocationService.getSuggestion({
             latitude,
             longitude,
             radius,

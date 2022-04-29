@@ -23,6 +23,6 @@ const readSampleData = (filePath) => new Promise((promiseRes, promiseRej) => {
 const main = async () => {
     const result = await readSampleData('./bin/cities_canada-usa.tsv');
     console.log(result);
-    console.log(result[0]);
+    // console.log(result[0]);
 };
 main();
