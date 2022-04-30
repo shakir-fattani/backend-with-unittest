@@ -1,6 +1,6 @@
 const Location = require('./models/location');
 
-const getSuggestionDAL = ({
+const getSuggestionDAL = async ({
     query, latitude, longitude, radius, sort = 'distance',
 }) => {
     console.log({
@@ -8,19 +8,35 @@ const getSuggestionDAL = ({
     });
     let location = Location.aggregate();
     if (latitude || longitude || radius) {
-        location = location.near({
+        const nearQ = {
             near: { type: 'Point', coordinates: [longitude, latitude] },
             distanceField: 'distance',
-            maxDistance: parseInt(radius, 10) || 10000000,
-        });
+        };
+        if (radius && radius > 0) {
+            nearQ.maxDistance = radius;
+        }
+
+        location = location.near(nearQ);
     }
     if (query) {
         location = location.match({
-            name: { $search: query },
+            name: {
+                $regex: query,
+                $options: "i",
+            },
         });
     }
-
-    return location.sort({ [sort]: 'asc' }).read();
+    location = location.project({
+        name: 1,
+        location:1,
+        distance:1,
+    }).sort({ [sort]: 'asc' });
+    return new Promise((res, rej) => {
+        location.exec((err, result) => {
+            if (err) rej(err)
+            else res(result)
+        });
+    });    
 };
 
 const addLocationObj = async (locationObj = {}) => {

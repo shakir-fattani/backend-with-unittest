@@ -3,13 +3,12 @@ const { LocationService } = require('../services/index');
 
 const router = new RestApi.RESTRouter();
 
-router.get('/suggestions', (req) => {
+router.get('/suggestions', async (req) => {
     const {
         q, latitude, longitude, radius, sort,
     } = req.query;
-
     return {
-        suggestions: LocationService.getSuggestion({
+        suggestions: await LocationService.getSuggestion({
             latitude,
             longitude,
             radius,
