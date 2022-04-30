@@ -34,7 +34,12 @@ const getSuggestionDAL = async ({
     return new Promise((res, rej) => {
         location.exec((err, result) => {
             if (err) rej(err)
-            else res(result)
+            else res(result.map(re => ({
+                name: re.name,
+                latitude: re.location.coordinates[1],
+                longitude: re.location.coordinates[0],
+                distance: re.distance,
+            })))
         });
     });    
 };
