@@ -6,11 +6,11 @@ const pointSchema = new mongoose.Schema({
 }, { _id: false });
 
 const locationSchema = new mongoose.Schema({
-    id: { type: Number, required: true },
+    id: { type: Number, required: true, unique: true },
     name: { type: String, required: true },
     location: { type: pointSchema, required: true },
     ascii: { type: String, required: true },
-    alt_name: { type: String, required: true },
+    alt_name: { type: String },
     feat_class: { type: String, required: true },
     feat_code: { type: String, required: true },
     country: { type: String, required: true },
@@ -28,6 +28,6 @@ const locationSchema = new mongoose.Schema({
 
 locationSchema.index({ location: '2dsphere' });
 
-const Location = mongoose.model('Location', locationSchema);
+const Location = mongoose.model('locations', locationSchema);
 
 module.exports = Location;

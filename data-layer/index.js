@@ -1,28 +1,32 @@
 const Location = require('./models/location');
 
-const addDistanceFieldinCity = (long, lat, radius) => ({
-    $geoNear: {
-        near: {
-            type: 'Point',
-            coordinates: [long, lat],
-        },
-        maxDistance: radius,
-        spherical: true,
-        distanceField: 'distance',
-        distanceMultiplier: 0.000621371,
-    },
-});
-
 const getSuggestionDAL = ({
-    query, latitude, longitude, radius, sort,
+    query, latitude, longitude, radius, sort = 'distance',
 }) => {
     console.log({
         query, latitude, longitude, radius, sort,
     });
-    return Location.aggregate([
-        addDistanceFieldinCity(longitude, latitude, radius),
-    ]);
+    let location = Location.aggregate();
+    if (latitude || longitude || radius) {
+        location = location.near({
+            near: { type: 'Point', coordinates: [longitude, latitude] },
+            distanceField: 'distance',
+            maxDistance: parseInt(radius, 10) || 10000000,
+        });
+    }
+    if (query) {
+        location = location.match({
+            name: { $search: query },
+        });
+    }
+
+    return location.sort({ [sort]: 'asc' }).read();
 };
 
-const addLocations = (locationObjs = []) => Location.insertMany(locationObjs)
-module.exports = { getSuggestionDAL, addLocations };
+const addLocationObj = async (locationObj = {}) => {
+    const l = await Location.create(locationObj);
+    await l.save();
+    return l;
+};
+
+module.exports = { getSuggestionDAL, addLocationObj };

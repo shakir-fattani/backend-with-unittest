@@ -1,6 +1,8 @@
 const fs = require('fs');
 const CsvReadableStream = require('csv-reader');
-const { addLocations } = require('./../data-layer/index')
+const { connectMongoose } = require('../common/mongoose');
+const { addLocationObj } = require('../data-layer/index');
+
 const readSampleData = (filePath) => new Promise((promiseRes, promiseRej) => {
     const inputStream = fs.createReadStream(filePath, 'utf8');
     const result = [];
@@ -21,15 +23,18 @@ const readSampleData = (filePath) => new Promise((promiseRes, promiseRej) => {
 });
 
 const main = async () => {
+    await connectMongoose();
     const result = await readSampleData('./bin/cities_canada-usa.tsv');
-    
-    const locationObjs = result.map(obj => ({
+
+    const locationObjs = result.map((obj) => ({
         id: obj.id,
         name: obj.name,
         ascii: obj.ascii,
         alt_name: obj.alt_name,
-        lat: obj.lat,
-        long: obj.long,
+        location: {
+            type: 'Point',
+            coordinates: [obj.long, obj.lat],
+        },
         feat_class: obj.feat_class,
         feat_code: obj.feat_code,
         country: obj.country,
@@ -43,9 +48,9 @@ const main = async () => {
         dem: obj.dem,
         tz: obj.tz,
         modified_at: new Date(obj.modified_at),
-    }))
-    
-    const locations = await addLocations(locationObjs);
-    console.log(locations);
+    }));
+    for (const l of locationObjs) {
+        await addLocationObj(l);
+    }
 };
-main();
+main().catch(console.error).then(() => process.exit());
