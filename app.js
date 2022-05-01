@@ -33,6 +33,15 @@ app.get('/health', (req, res) => {
     return { alive: true };
 });
 
+app.expressUseSingleParam((req, res, next) => {
+    console.error({
+        originalUrl: req.originalUrl,
+        params: req.params,
+        query: req.query,
+    });
+    next();
+});
+
 app.options('/*', (req, res) => res.end());
 
 app.get('/identify', () => {
@@ -72,4 +81,4 @@ app.expressUseSingleParam((err, req, res, next) => {
     next(err);
 });
 
-module.exports = app;
+module.exports = { app };

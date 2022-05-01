@@ -1,7 +1,7 @@
 const fs = require('fs');
 const CsvReadableStream = require('csv-reader');
 const { connectMongoose } = require('../common/mongoose');
-const { addLocationObj } = require('../data-layer/index');
+const { addLocationObj, doesLocationExists } = require('../data-layer/index');
 
 const readSampleData = (filePath) => new Promise((promiseRes, promiseRej) => {
     const inputStream = fs.createReadStream(filePath, 'utf8');
@@ -53,7 +53,10 @@ const main = async () => {
     // eslint-disable-next-line no-restricted-syntax
     for (const l of locationObjs) {
         // eslint-disable-next-line no-await-in-loop
-        await addLocationObj(l);
+        if (!await doesLocationExists(l.id)) {
+            // eslint-disable-next-line no-await-in-loop
+            await addLocationObj(l);
+        }
     }
 };
 main().catch(console.error).then(() => process.exit());

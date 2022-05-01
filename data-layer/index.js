@@ -1,7 +1,7 @@
 const Location = require('./models/location');
 
 const getSuggestionDAL = async ({
-    query, latitude, longitude, radius, sort = 'distance',
+    query, latitude, longitude, radius, sort = 'name',
 }) => {
     let location = Location.aggregate();
     if (latitude || longitude || radius) {
@@ -16,6 +16,9 @@ const getSuggestionDAL = async ({
         }
 
         location = location.near(nearQ);
+    } else if (sort === 'distance') {
+        // eslint-disable-next-line no-param-reassign
+        sort = 'name';
     }
     if (query) {
         location = location.match({
@@ -45,10 +48,12 @@ const getSuggestionDAL = async ({
     });
 };
 
+const doesLocationExists = (id) => Location.exists({ id });
+
 const addLocationObj = async (locationObj = {}) => {
     const l = await Location.create(locationObj);
     await l.save();
     return l;
 };
 
-module.exports = { getSuggestionDAL, addLocationObj };
+module.exports = { getSuggestionDAL, addLocationObj, doesLocationExists };

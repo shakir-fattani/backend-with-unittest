@@ -5,10 +5,10 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node bin/import-data.js && node index.js",
     "style": "eslint **/*.js",
     "style-fix": "eslint **/*.js --fix",
-    "test": "mocha",
+    "test": "node bin/import-data.js && mocha --exit -- --parallel",
     "pretest": "eslint --ignore-path .gitignore ."
   },
   "repository": {
@@ -35,6 +35,7 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-no-only-tests": "^2.6.0",
     "mocha": "^9.2.2",
+    "sinon": "^13.0.2",
     "sinon-chai": "^3.7.0"
   },
   "dependencies": {
