@@ -1,67 +1,35 @@
-const RESTApi = require('faster-api-deploy');
+const stoppable = require('stoppable');
+const app = require('./app');
 const logger = require('./common/logger');
-const { getHealthCheck } = require('./common/health');
-const { connectMongoose } = require('./common/mongoose');
 const {
-    getUpTime, START_TIME, POWERED_BY, VERSION,
-    API_VERSION, APP_NAME, SERVER_PORT, HOST_NAME,
+    APP_NAME, SERVER_PORT, HOST_NAME,
 } = require('./config');
 
-const isHealth = getHealthCheck();
+// just for demonstrate that it really doesn't receive requests after 4s
+const DEBUG_DELAY = process.env.DEBUG_DELAY || 2000;
+// failureThreshold: 2, periodSeconds: 2 (4s)
+const READINESS_PROBE_DELAY = process.env.READINESS_PROBE_DELAY || 2 * 2 * 1000;
 
-const app = new RESTApi('', {
-    isSupportJSON: false,
-    isSupportURLEncode: false,
-});
+const main = async () => {
+    app.setListeningIP(HOST_NAME);
+    const server = await app.startListening(SERVER_PORT, 'PRODUCTION', APP_NAME);
 
-app.setPoweredBy(POWERED_BY);
-app.setVersion(VERSION);
-app.setApiVersion(API_VERSION);
+    stoppable(server, READINESS_PROBE_DELAY + DEBUG_DELAY);
 
-connectMongoose();
-app.get('/health', (req, res) => {
-    const valu = isHealth();
+    function gracefulStop() {
+        logger.warn('Received kill signal, shutting down gracefully');
 
-    if (valu) return { alive: true };
+        server.stop(() => {
+            logger.warn('Closed out remaining connections');
+            process.exit(0);
+        });
+    }
 
-    res.status(500);
-    res.end();
-});
+    // do not accept more request
+    process.on('SIGTERM', () => {
+        logger.warn('Got SIGTERM. Graceful shutdown start', new Date().toISOString());
+        gracefulStop();
+    });
+};
 
-app.options('/*', (req, res) => res.end());
-
-app.get('/identify', () => {
-    const used = process.memoryUsage();
-
-    for (const key in used) used[key] = `${Math.round(used[key] / 1024.0 / 1024.0 * 100.0) / 100} MB`;
-
-    return {
-        startTime: START_TIME,
-        memory: used,
-        upSinceMilliSeconds: getUpTime(),
-        appName: APP_NAME,
-        version: VERSION,
-        HOSTNAME: HOST_NAME,
-        apiVersion: API_VERSION,
-        cpu: process.cpuUsage(),
-    };
-});
-
-app.expressUseSingleParam(require('./common/request-logger'));
-
-app.filter((req, res, next) => {
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate'); // HTTP 1.1
-    res.setHeader('Pragma', 'no-cache'); // HTTP 1.0
-    res.setHeader('Expires', '0');
-    next();
-});
-
-app.use('/', require('./controllers/index'));
-
-app.expressUseSingleParam((err, req, res, next) => {
-    logger.warn(typeof err === 'object' ? (err.message || 'went wrong') : err, { err });
-    next(err);
-});
-
-app.setListeningIP(HOST_NAME);
-app.startListening(SERVER_PORT, 'PRODUCTION', APP_NAME);
+main();
