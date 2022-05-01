@@ -49,7 +49,10 @@ const main = async () => {
         tz: obj.tz,
         modified_at: new Date(obj.modified_at),
     }));
+
+    // eslint-disable-next-line no-restricted-syntax
     for (const l of locationObjs) {
+        // eslint-disable-next-line no-await-in-loop
         await addLocationObj(l);
     }
 };

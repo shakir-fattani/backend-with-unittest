@@ -1,3 +1,4 @@
+/* eslint-disable guard-for-in */
 const RESTApi = require('faster-api-deploy');
 const logger = require('./common/logger');
 const { getHealthCheck } = require('./common/health');
@@ -22,10 +23,14 @@ connectMongoose();
 app.get('/health', (req, res) => {
     const valu = isHealth();
 
-    if (valu) return { alive: true };
+    if (!valu) {
+        res.status(500);
+        res.end();
+        return;
+    }
 
-    res.status(500);
-    res.end();
+    // eslint-disable-next-line consistent-return
+    return { alive: true };
 });
 
 app.options('/*', (req, res) => res.end());
@@ -33,7 +38,10 @@ app.options('/*', (req, res) => res.end());
 app.get('/identify', () => {
     const used = process.memoryUsage();
 
-    for (const key in used) used[key] = `${Math.round(used[key] / 1024.0 / 1024.0 * 100.0) / 100} MB`;
+    // eslint-disable-next-line no-restricted-syntax
+    for (const key in used) {
+        used[key] = `${Math.round((used[key] / (1024.0 * 1024.0)) * 100.0) / 100} MB`;
+    }
 
     return {
         startTime: START_TIME,
@@ -48,8 +56,9 @@ app.get('/identify', () => {
 });
 
 app.expressUseSingleParam(require('./common/request-logger'));
-// no-cache for api, proxy-handler
+// eslint-disable-next-line array-callback-return
 app.filter((req, res, next) => {
+    // no-cache for api, proxy-handler
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate'); // HTTP 1.1
     res.setHeader('Pragma', 'no-cache'); // HTTP 1.0
     res.setHeader('Expires', '0');
