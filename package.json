@@ -8,7 +8,7 @@
     "start": "node index.js",
     "style": "eslint **/*.js",
     "style-fix": "eslint **/*.js --fix",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "pretest": "eslint --ignore-path .gitignore ."
   },
   "repository": {
@@ -23,9 +23,11 @@
   },
   "homepage": "https://github.com/shakir-fattani/backend-with-unittest#readme",
   "devDependencies": {
+    "chai": "^4.3.6",
     "eslint": "^7.30.0",
     "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.22.1"
+    "eslint-plugin-import": "^2.22.1",
+    "mocha": "^9.2.2"
   },
   "dependencies": {
     "csv-reader": "^1.0.8",
@@ -33,6 +35,7 @@
     "minimist": "^1.2.6",
     "mongoose": "^6.3.1",
     "morgan": "^1.10.0",
+    "stoppable": "^1.1.0",
     "uuid": "^8.3.2"
   }
 }
